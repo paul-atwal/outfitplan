@@ -1,23 +1,52 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react";
+import "./App.css";
+import Outfit from "./components/Outfit";
+import OutfitManager from "./components/OutfitManager";
 
 function App() {
+  const [outfits, setOutfits] = useState({});
+  const [currentOutfit, setCurrentOutfit] = useState("");
+
+  const addOutfit = (name) => {
+    setOutfits((prevOutfits) => ({
+      ...prevOutfits,
+      [name]: { tops: [], bottoms: [], shoes: [], accessories: [] },
+    }));
+    setCurrentOutfit(name);
+  };
+
+  const updateOutfitItems = (name, newItems) => {
+    setOutfits((prevOutfits) => {
+      const updatedOutfit = { ...prevOutfits[name] };
+
+      for (const category in newItems) {
+        updatedOutfit[category] = [
+          ...updatedOutfit[category],
+          ...newItems[category],
+        ];
+      }
+
+      return {
+        ...prevOutfits,
+        [name]: updatedOutfit,
+      };
+    });
+  };
+
+  const setItems = (newItems) => {
+    updateOutfitItems(currentOutfit, newItems);
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <OutfitManager
+        outfits={Object.keys(outfits)}
+        addOutfit={addOutfit}
+        setCurrentOutfit={setCurrentOutfit}
+      />
+      {currentOutfit && (
+        <Outfit items={outfits[currentOutfit]} setItems={setItems} />
+      )}
     </div>
   );
 }
